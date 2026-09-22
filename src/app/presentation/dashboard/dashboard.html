@@ -1,0 +1,41 @@
+<mat-toolbar color="primary" class="toolbar">
+  <mat-icon>gavel</mat-icon>
+  <span>Contrataciones</span>
+  <span class="espaciador"></span>
+  @if (usuario(); as u) {
+    <span class="usuario">
+      <mat-icon aria-hidden="true">account_circle</mat-icon>
+      {{ u.nombre }} ({{ u.rol }})
+    </span>
+  }
+  <button mat-icon-button (click)="cerrarSesion()" aria-label="Cerrar sesión">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<main class="contenido">
+  <section class="kpis">
+    <h2>Indicadores</h2>
+    <mat-card class="grid">
+      @for (k of kpis(); track k.label) {
+        <mat-card class="kpi" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>{{ k.label }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="valor" [ngClass]="'color-' + k.color">{{ k.valor }}</div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </mat-card>
+  </section>
+
+  <section class="proximos">
+    <h2>Próximos a vencer</h2>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <p class="vacio">No hay contratos próximos a vencer.</p>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</main>

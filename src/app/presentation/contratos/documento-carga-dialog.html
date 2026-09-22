@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>
+  <mat-icon>cloud_upload</mat-icon>
+  Subir documentos
+</h2>
+
+<mat-dialog-content class="dialog-contenido">
+  @if (error()) {
+    <div class="alerta" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="zona-drop" (dragover)="onDragOver($event)" (drop)="onDrop($event)" [class.activa]="subiendo()">
+    <input type="file" #fileInput multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif" (change)="onArchivosSeleccionados($event)" style="display: none;" />
+    <div class="drop-contenido">
+      <mat-icon>cloud_upload</mat-icon>
+      <p>Arrastre archivos aquí o <button mat-button type="button" (click)="fileInput.click()">seleccione</button></p>
+      <p class="ayuda">PDF, DOCX, XLSX, imágenes · Máx. {{ formatearTamano(TAMANO_MAXIMO_ARCHIVO) }}</p>
+    </div>
+  </div>
+
+  @if (archivos().length > 0) {
+    <div class="lista-archivos">
+      <h4>Archivos seleccionados ({{ archivos().length }})</h4>
+      @for (archivo of archivos(); track archivo; let i = $index) {
+        <mat-card class="archivo-item" appearance="outlined">
+          <mat-card-content>
+            <div class="archivo-info">
+              <mat-icon>insert_drive_file</mat-icon>
+              <div class="archivo-detalles">
+                <strong>{{ archivo.name }}</strong>
+                <span>{{ formatearTamano(archivo.size) }}</span>
+              </div>
+            </div>
+            <button mat-icon-button (click)="eliminarArchivo(i)" aria-label="Eliminar archivo" color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()" [disabled]="subiendo()">
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+  <button mat-flat-button color="primary" (click)="subir()" [disabled]="archivos().length === 0 || subiendo()">
+    @if (subiendo()) {
+      <mat-spinner diameter="20"></mat-spinner>
+      Subiendo...
+    } @else {
+      <mat-icon>cloud_upload</mat-icon>
+      Subir {{ archivos().length }} archivo{{ archivos().length !== 1 ? 's' : '' }}
+    }
+  </button>
+</mat-dialog-actions>

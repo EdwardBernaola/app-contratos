@@ -1,0 +1,261 @@
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+<div class="contenedor">
+  <header class="cabecera">
+    <button mat-icon-button (click)="volver()" aria-label="Volver">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="titulo-seccion" style="flex: 1;">
+      @if (contrato(); as c) {
+        <div class="codigo-estado">
+          <span class="codigo">{{ c.codigo }}</span>
+          <mat-chip [color]="obtenerColorEstado(c.estado)" selected>
+            {{ getEstadoEtiqueta(c.estado) }}
+          </mat-chip>
+        </div>
+        <h1>{{ c.titulo }}</h1>
+      }
+    </div>
+    <div class="acciones-cabecera">
+      <button mat-icon-button (click)="editar()" matTooltip="Editar" aria-label="Editar">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button (click)="eliminar()" matTooltip="Eliminar" aria-label="Eliminar" color="warn">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alerta" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (contrato(); as c) {
+    <mat-tab-group class="tabs" dynamicHeight>
+      <mat-tab label="Información general">
+        <div class="tab-contenido">
+          <mat-card class="info-card" appearance="outlined">
+            <mat-card-header>
+              <mat-card-title>Datos del contrato</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="grid-3">
+                <div class="campo-info">
+                  <label>Código</label>
+                  <span>{{ c.codigo }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Tipo</label>
+                  <mat-chip>{{ c.tipo }}</mat-chip>
+                </div>
+                <div class="campo-info">
+                  <label>Estado</label>
+                  <mat-chip [color]="obtenerColorEstado(c.estado)" selected>
+                    {{ getEstadoEtiqueta(c.estado) }}
+                  </mat-chip>
+                </div>
+              </div>
+
+              <mat-divider class="divider-full" />
+
+              <div class="grid-2">
+                <div class="campo-info">
+                  <label>Título</label>
+                  <span>{{ c.titulo }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Objeto</label>
+                  <span>{{ c.objeto || '—' }}</span>
+                </div>
+              </div>
+
+              <mat-divider class="divider-full" />
+
+              <div class="grid-3">
+                <div class="campo-info">
+                  <label>Área</label>
+                  <span>{{ c.area?.nombre || c.areaId }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Responsable</label>
+                  <span>{{ c.responsable?.nombre || c.responsableId }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Contratista</label>
+                  <span>{{ c.contratista.nombre }} ({{ c.contratista.identificacion }})</span>
+                </div>
+              </div>
+
+              <mat-divider class="divider-full" />
+
+              <div class="grid-4">
+                <div class="campo-info">
+                  <label>Fecha inicio</label>
+                  <span>{{ formatearFecha(c.fechaInicio) }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Fecha fin</label>
+                  <span>{{ formatearFecha(c.fechaFin) }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Valor</label>
+                  <span>{{ formatearMoneda(c.valor, c.moneda) }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Días para vencer</label>
+                  <span class="dias-vencimiento" [ngClass]="'severidad-' + obtenerSeveridadVencimiento(c.diasParaVencer)">
+                    {{ c.diasParaVencer }} {{ c.diasParaVencer === 1 ? 'día' : 'días' }}
+                  </span>
+                </div>
+              </div>
+
+              @if (c.descripcion) {
+                <mat-divider class="divider-full" />
+                <div class="campo-info campo-completo">
+                  <label>Observaciones</label>
+                  <span>{{ c.descripcion }}</span>
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="info-card" appearance="outlined">
+            <mat-card-header>
+              <mat-card-title>Contratista</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="grid-3">
+                <div class="campo-info">
+                  <label>Nombre</label>
+                  <span>{{ c.contratista.nombre }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Identificación</label>
+                  <span>{{ c.contratista.identificacion }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Contacto</label>
+                  <span>{{ c.contratista.contacto || '—' }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Email</label>
+                  <span>{{ c.contratista.email || '—' }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Teléfono</label>
+                  <span>{{ c.contratista.telefono || '—' }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="info-card" appearance="outlined">
+            <mat-card-header>
+              <mat-card-title>Auditoría</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="grid-4">
+                <div class="campo-info">
+                  <label>Creado por</label>
+                  <span>{{ c.creadoPor }}</span>
+                </div>
+                <div class="campo-info">
+                  <label>Creado en</label>
+                  <span>{{ formatearFecha(c.creadoEn) }}</span>
+                </div>
+                @if (c.actualizadoPor) {
+                  <div class="campo-info">
+                    <label>Actualizado por</label>
+                    <span>{{ c.actualizadoPor }}</span>
+                  </div>
+                  <div class="campo-info">
+                    <label>Actualizado en</label>
+                    <span>{{ formatearFecha(c.actualizadoEn!) }}</span>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Documentos">
+        <div class="tab-contenido">
+          <div class="documentos-header">
+            <h3>Documentos adjuntos</h3>
+            <button mat-raised-button color="primary" (click)="abrirCargaArchivos()" [disabled]="subiendo()">
+              <mat-icon>cloud_upload</mat-icon>
+              Subir documentos
+            </button>
+          </div>
+
+          @if (archivos().length === 0) {
+            <mat-card class="estado-vacio" appearance="outlined">
+              <mat-card-content class="vacio-contenido">
+                <mat-icon>description</mat-icon>
+                <h3>Sin documentos</h3>
+                <p>Este contrato no tiene documentos adjuntos.</p>
+                <button mat-raised-button color="primary" (click)="abrirCargaArchivos()">
+                  <mat-icon>cloud_upload</mat-icon>
+                  Subir primer documento
+                </button>
+              </mat-card-content>
+            </mat-card>
+          } @else {
+            <div class="documentos-lista">
+              @for (archivo of archivos(); track archivo.id) {
+                <mat-card class="documento-card" appearance="outlined">
+                  <mat-card-content>
+                    <div class="doc-info">
+                      <mat-icon [class.previsualizable]="esPrevisualizable(archivo.tipoMime)">
+                        {{ esPrevisualizable(archivo.tipoMime) ? 'picture_as_pdf' : 'insert_drive_file' }}
+                      </mat-icon>
+                      <div class="doc-detalles">
+                        <strong>{{ archivo.nombreOriginal }}</strong>
+                        <span class="doc-meta">
+                          {{ formatearTamano(archivo.tamano) }} · {{ archivo.tipoMime }} ·
+                          {{ formatearFecha(archivo.cargadoEn) }} por {{ archivo.cargadoPor }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="doc-acciones">
+                      @if (esPrevisualizable(archivo.tipoMime)) {
+                        <button mat-icon-button (click)="previsualizar(archivo)" matTooltip="Previsualizar">
+                          <mat-icon>visibility</mat-icon>
+                        </button>
+                      }
+                      <button mat-icon-button (click)="descargar(archivo)" matTooltip="Descargar">
+                        <mat-icon>download</mat-icon>
+                      </button>
+                      <button mat-icon-button (click)="eliminarArchivo(archivo)" matTooltip="Eliminar" color="warn">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Historial">
+        <div class="tab-contenido">
+          <mat-card class="info-card" appearance="outlined">
+            <mat-card-header>
+              <mat-card-title>Historial de cambios</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="vacio">El historial de cambios se mostrará aquí cuando se implemente el módulo de auditoría.</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

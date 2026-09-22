@@ -1,0 +1,222 @@
+<div class="contenedor">
+  <header class="cabecera">
+    <div class="titulo-seccion">
+      <mat-icon>description</mat-icon>
+      <div>
+        <h1>Contratos</h1>
+        <p>Gestión y seguimiento de contratos</p>
+      </div>
+    </div>
+    <div class="acciones-cabecera">
+      <button mat-raised-button color="primary" (click)="nueva()">
+        <mat-icon>add</mat-icon>
+        Nuevo contrato
+      </button>
+    </div>
+  </header>
+
+  @if (cargando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  @if (error()) {
+    <div class="alerta" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error() }}</span>
+      <button mat-icon-button (click)="cargar()" aria-label="Reintentar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  }
+
+  <mat-card class="tarjeta-filtros" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Filtros</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filtros" class="filtros-grid" (ngSubmit)="cargar()">
+        <mat-form-field appearance="outline" class="campo-completo">
+          <mat-label>Buscar</mat-label>
+          <input matInput formControlName="busqueda" placeholder="Código, título, contratista..." />
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option value="">Todos</mat-option>
+            @for (e of estados; track e.valor) {
+              <mat-option [value]="e.valor">{{ e.etiqueta }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <mat-select formControlName="tipo">
+            <mat-option value="">Todos</mat-option>
+            @for (t of tipos; track t.valor) {
+              <mat-option [value]="t.valor">{{ t.etiqueta }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha inicio desde</mat-label>
+          <input matInput [matDatepicker]="dpInicioDesde" formControlName="fechaInicioDesde" />
+          <mat-datepicker-toggle matSuffix [for]="dpInicioDesde"></mat-datepicker-toggle>
+          <mat-datepicker #dpInicioDesde></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha inicio hasta</mat-label>
+          <input matInput [matDatepicker]="dpInicioHasta" formControlName="fechaInicioHasta" />
+          <mat-datepicker-toggle matSuffix [for]="dpInicioHasta"></mat-datepicker-toggle>
+          <mat-datepicker #dpInicioHasta></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha fin desde</mat-label>
+          <input matInput [matDatepicker]="dpFinDesde" formControlName="fechaFinDesde" />
+          <mat-datepicker-toggle matSuffix [for]="dpFinDesde"></mat-datepicker-toggle>
+          <mat-datepicker #dpFinDesde></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha fin hasta</mat-label>
+          <input matInput [matDatepicker]="dpFinHasta" formControlName="fechaFinHasta" />
+          <mat-datepicker-toggle matSuffix [for]="dpFinHasta"></mat-datepicker-toggle>
+          <mat-datepicker #dpFinHasta></mat-datepicker>
+        </mat-form-field>
+
+        <div class="botones-filtros">
+          <button mat-button type="submit">
+            <mat-icon>filter_list</mat-icon>
+            Filtrar
+          </button>
+          <button mat-button type="button" (click)="limpiarFiltros()">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (!cargando() && dataSource().length === 0) {
+    <mat-card class="estado-vacio" appearance="outlined">
+      <mat-card-content class="vacio-contenido">
+        <mat-icon>description</mat-icon>
+        <h3>No hay contratos</h3>
+        <p>No se encontraron contratos con los filtros actuales.</p>
+        <button mat-raised-button color="primary" (click)="nueva()">
+          <mat-icon>add</mat-icon>
+          Crear primer contrato
+        </button>
+      </mat-card-content>
+    </mat-card>
+  } @else if (!cargando()) {
+    <div class="tabla-contenedor">
+      <table mat-table [dataSource]="dataSource()" class="tabla" matSort>
+
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
+          <td mat-cell *matCellDef="let c">
+            <span class="codigo">{{ c.codigo }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="titulo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Título / Objeto</th>
+          <td mat-cell *matCellDef="let c">
+            <div class="celda-titulo">
+              <strong>{{ c.titulo }}</strong>
+              @if (c.objeto) {
+                <span class="objeto">{{ c.objeto }}</span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="tipo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+          <td mat-cell *matCellDef="let c">
+            <mat-chip>{{ c.tipo }}</mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="area">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Área</th>
+          <td mat-cell *matCellDef="let c">{{ c.area?.nombre || c.areaId }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="responsable">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Responsable</th>
+          <td mat-cell *matCellDef="let c">{{ c.responsable?.nombre || c.responsableId }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fechaInicio">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Inicio</th>
+          <td mat-cell *matCellDef="let c">{{ formatearFecha(c.fechaInicio) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fechaFin">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Fin</th>
+          <td mat-cell *matCellDef="let c">{{ formatearFecha(c.fechaFin) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+          <td mat-cell *matCellDef="let c">
+            <mat-chip [color]="obtenerColorEstado(c.estado)" selected>
+              {{ estados.find(e => e.valor === c.estado)?.etiqueta || c.estado }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="diasParaVencer">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Días para vencer</th>
+          <td mat-cell *matCellDef="let c">
+            @if (c.diasParaVencer !== undefined) {
+              <span class="dias-vencimiento" [ngClass]="'severidad-' + obtenerSeveridadVencimiento(c.diasParaVencer)">
+                {{ c.diasParaVencer }} {{ c.diasParaVencer === 1 ? 'día' : 'días' }}
+              </span>
+            } @else {
+              <span class="vacio">—</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let c">
+            <button mat-icon-button (click)="ver(c.id)" matTooltip="Ver detalle" aria-label="Ver">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button (click)="editar(c.id)" matTooltip="Editar" aria-label="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="eliminar(c.id)" matTooltip="Eliminar" aria-label="Eliminar" color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+      </table>
+
+      @if (totalElementos() > pageSize()) {
+        <mat-paginator
+          [length]="totalElementos()"
+          [pageSize]="pageSize()"
+          [pageIndex]="pageIndex()"
+          [pageSizeOptions]="[5, 10, 20, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+          aria-label="Paginación de contratos">
+        </mat-paginator>
+      }
+    </div>
+  }
+</div>

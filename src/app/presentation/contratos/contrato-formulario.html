@@ -1,0 +1,261 @@
+<div class="contenedor">
+  @if (cargando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  <header class="cabecera">
+    <div class="titulo-seccion">
+      <mat-icon>{{ esEdicion() ? 'edit' : 'add' }}</mat-icon>
+      <div>
+        <h1>{{ esEdicion() ? 'Editar contrato' : 'Nuevo contrato' }}</h1>
+        <p>{{ esEdicion() ? 'Modifique los datos del contrato' : 'Complete los datos para registrar un nuevo contrato' }}</p>
+      </div>
+    </div>
+    <div class="acciones-cabecera">
+      <button mat-button (click)="cancelar()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alerta" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+    <mat-card class="seccion" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Información general</mat-card-title>
+        <mat-card-subtitle>Datos básicos del contrato</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid-2">
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Código</mat-label>
+            <input matInput formControlName="codigo" placeholder="CTR-2026-XXXX" />
+            <mat-icon matPrefix>tag</mat-icon>
+            @if (formulario.controls.codigo.hasError('required')) {
+              <mat-error>El código es obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="tipo">
+              @for (t of tipos; track t.valor) {
+                <mat-option [value]="t.valor">{{ t.etiqueta }}</mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>category</mat-icon>
+            @if (formulario.controls.tipo.hasError('required')) {
+              <mat-error>El tipo es obligatorio</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="campo-completo">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="titulo" placeholder="Título breve del contrato" />
+          <mat-icon matPrefix>title</mat-icon>
+          @if (formulario.controls.titulo.hasError('required')) {
+            <mat-error>El título es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="campo-completo">
+          <mat-label>Objeto / Descripción</mat-label>
+          <textarea matInput formControlName="objeto" rows="3" placeholder="Descripción detallada del objeto del contrato"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="seccion" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Partes y clasificación</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Área</mat-label>
+            <mat-select formControlName="areaId">
+              <mat-option value="a1">Tecnología</mat-option>
+              <mat-option value="a2">Administración</mat-option>
+            </mat-select>
+            <mat-icon matPrefix>business</mat-icon>
+            @if (formulario.controls.areaId.hasError('required')) {
+              <mat-error>El área es obligatoria</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Responsable</mat-label>
+            <mat-select formControlName="responsableId">
+              <mat-option value="u1">María González</mat-option>
+              <mat-option value="u2">Juan Martínez</mat-option>
+            </mat-select>
+            <mat-icon matPrefix>person</mat-icon>
+            @if (formulario.controls.responsableId.hasError('required')) {
+              <mat-error>El responsable es obligatorio</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="grid-3">
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Contratista - Identificación</mat-label>
+            <input matInput formControlName="contratistaIdentificacion" placeholder="NIT / CC" />
+            <mat-icon matPrefix>badge</mat-icon>
+            @if (formulario.controls.contratistaIdentificacion.hasError('required')) {
+              <mat-error>La identificación es obligatoria</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Contratista - Nombre</mat-label>
+            <input matInput formControlName="contratistaNombre" placeholder="Nombre/Razón social" />
+            <mat-icon matPrefix>business</mat-icon>
+            @if (formulario.controls.contratistaNombre.hasError('required')) {
+              <mat-error>El nombre es obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Contacto</mat-label>
+            <input matInput formControlName="contratistaContacto" placeholder="Nombre del contacto" />
+            <mat-icon matPrefix>person_outline</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="grid-3">
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="contratistaEmail" placeholder="correo@empresa.com" type="email" />
+            <mat-icon matPrefix>email</mat-icon>
+            @if (formulario.controls.contratistaEmail.hasError('email')) {
+              <mat-error>Correo inválido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="contratistaTelefono" placeholder="+57 300 123 4567" />
+            <mat-icon matPrefix>phone</mat-icon>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="seccion" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Plazos y económico</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de inicio</mat-label>
+            <input matInput [matDatepicker]="dpInicio" formControlName="fechaInicio" />
+            <mat-datepicker-toggle matSuffix [for]="dpInicio"></mat-datepicker-toggle>
+            <mat-datepicker #dpInicio></mat-datepicker>
+            @if (formulario.controls.fechaInicio.hasError('required')) {
+              <mat-error>La fecha de inicio es obligatoria</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de fin</mat-label>
+            <input matInput [matDatepicker]="dpFin" formControlName="fechaFin" />
+            <mat-datepicker-toggle matSuffix [for]="dpFin"></mat-datepicker-toggle>
+            <mat-datepicker #dpFin></mat-datepicker>
+            @if (formulario.controls.fechaFin.hasError('required')) {
+              <mat-error>La fecha de fin es obligatoria</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Valor</mat-label>
+            <input matInput type="number" formControlName="valor" placeholder="0.00" step="0.01" />
+            <mat-icon matPrefix>attach_money</mat-icon>
+            @if (formulario.controls.valor.hasError('required')) {
+              <mat-error>El valor es obligatorio</mat-error>
+            } @else if (formulario.controls.valor.hasError('min')) {
+              <mat-error>El valor debe ser mayor o igual a 0</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Moneda</mat-label>
+            <mat-select formControlName="moneda">
+              @for (m of monedas; track m.valor) {
+                <mat-option [value]="m.valor">{{ m.etiqueta }}</mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>currency_exchange</mat-icon>
+          </mat-form-field>
+        </div>
+
+        @if (formulario.hasError('fechasInvalidas')) {
+          <div class="error-fechas" role="alert">
+            <mat-icon>error_outline</mat-icon>
+            <span>La fecha de fin debe ser posterior a la fecha de inicio</span>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="seccion" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Estado y observaciones</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado">
+              @for (e of estados; track e.valor) {
+                <mat-option [value]="e.valor">
+                  <mat-chip [color]="obtenerColorEstado(e.valor)" selected>{{ e.etiqueta }}</mat-chip>
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>flag</mat-icon>
+            @if (formulario.controls.estado.hasError('required')) {
+              <mat-error>El estado es obligatorio</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="campo-completo">
+          <mat-label>Observaciones</mat-label>
+          <textarea matInput formControlName="descripcion" rows="4" placeholder="Información adicional, cláusulas especiales, condiciones..."></textarea>
+          <mat-icon matPrefix>notes</mat-icon>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="acciones-formulario">
+      <button mat-button type="button" (click)="cancelar()">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+      <button mat-stroked-button color="primary" type="button" (click)="guardar(true)" [disabled]="guardando()">
+        <mat-icon>save</mat-icon>
+        Guardar como borrador
+      </button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="guardando() || formulario.invalid">
+        <ng-container *ngIf="guardando(); else btnNormal">
+          <mat-spinner diameter="20"></mat-spinner>
+          Guardando...
+        </ng-container>
+        <ng-template #btnNormal>
+          <mat-icon>save</mat-icon>
+          {{ esEdicion() ? 'Actualizar' : 'Crear' }} contrato
+        </ng-template>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,87 @@
+<div class="contenedor">
+  <mat-card class="tarjeta" appearance="outlined">
+    @if (cargando()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Iniciando sesión" />
+    }
+
+    <mat-card-header class="cabecera">
+      <div class="marca">
+        <mat-icon aria-hidden="true">gavel</mat-icon>
+        <span>Contrataciones</span>
+      </div>
+      <mat-card-title>Iniciar sesión</mat-card-title>
+      <mat-card-subtitle>Ingrese sus credenciales para continuar</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="formulario" (ngSubmit)="ingresar()" novalidate>
+        @if (error()) {
+          <div class="alerta" role="alert">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+            <span>{{ error() }}</span>
+          </div>
+        }
+
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Usuario</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="usuario"
+            autocomplete="username"
+            placeholder="usuario@empresa.com"
+          />
+          <mat-icon matPrefix aria-hidden="true">person_outline</mat-icon>
+          @if (formulario.controls.usuario.hasError('required')) {
+            <mat-error>El usuario es obligatorio</mat-error>
+          } @else if (formulario.controls.usuario.hasError('email')) {
+            <mat-error>Ingrese un correo válido</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            [type]="ocultarContrasena() ? 'password' : 'text'"
+            formControlName="contrasena"
+            autocomplete="current-password"
+          />
+          <mat-icon matPrefix aria-hidden="true">lock_outline</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="alternarContrasena()"
+            [attr.aria-label]="ocultarContrasena() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+            [attr.aria-pressed]="!ocultarContrasena()"
+          >
+            <mat-icon>{{ ocultarContrasena() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (formulario.controls.contrasena.hasError('required')) {
+            <mat-error>La contraseña es obligatoria</mat-error>
+          } @else if (formulario.controls.contrasena.hasError('minlength')) {
+            <mat-error>Mínimo 6 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="opciones">
+          <mat-checkbox formControlName="recordarme">Recordarme</mat-checkbox>
+          <a class="enlace" href="#" (click)="$event.preventDefault()">¿Olvidó su contraseña?</a>
+        </div>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="boton"
+          [disabled]="cargando()"
+        >
+          {{ cargando() ? 'Ingresando…' : 'Ingresar' }}
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <p class="pie">© 2026 Contrataciones</p>
+</div>

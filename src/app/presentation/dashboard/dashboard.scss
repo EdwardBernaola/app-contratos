@@ -1,0 +1,83 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.espaciador {
+  flex: 1;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.contenido {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+section {
+  margin-bottom: 24px;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.kpi {
+  padding: 16px;
+
+  mat-card-header {
+    padding-bottom: 8px;
+  }
+
+  mat-card-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .valor {
+    font-size: 2.5rem;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+.color-primary { color: var(--mat-sys-primary); }
+.color-accent { color: var(--mat-sys-secondary); }
+.color-warn { color: var(--mat-sys-tertiary); }
+
+.proximos mat-card {
+  min-height: 200px;
+}
+
+.vacio {
+  margin: 0;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+  padding: 48px 0;
+}
